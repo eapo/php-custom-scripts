@@ -1,0 +1,22 @@
+// WordPress template's functions.php hack
+// force to keep selected language (slug) on hardcoded links
+// compatible with any multilanguage module
+
+function lng_switcher_js() {
+	$postid = get_the_ID();
+	$perma = (strpos($_SERVER['REQUEST_URI'],"/en/")!== false?"en":"de");
+	$from = (strpos(wp_get_referer(),"/en/")!== false?"en":"de");
+	if ($from!=$perma && $_SERVER['QUERY_STRING']!=='lng') {
+		wp_safe_redirect('/'.$from.'/?p='.$postid.'#redir');
+	}
+
+	echo "<script class=\"lng_switcher_js eaposztrof\">" . "\n jQuery( document ).ready(function() { ". "\n";
+	if ($from!=$perma && $_SERVER['QUERY_STRING']!=='lng') {
+		echo "// /".$from."/?p=".$postid."#redir";
+	}
+	echo "/* postid: ".$postid." from: ".$from."|".wp_get_referer()." perma: ".$perma."|".$_SERVER['REQUEST_URI']." query: ".$_SERVER['QUERY_STRING']."*/" . "\n";
+	echo "var langhref=jQuery('li.wpml-ls-menu-item > a').attr('href');" . "\n";
+	echo "jQuery('li.wpml-ls-menu-item > a').attr('href', langhref+'?lng');" . "\n";
+	echo " }); </script>" . "\n";
+}
+add_action( 'wp_head', 'lng_switcher_js' );
